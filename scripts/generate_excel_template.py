@@ -11,7 +11,7 @@ from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils import get_column_letter
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parent
 CSV_DIR = ROOT / "data" / "templates" / "csv"
 OUT_XLSX = ROOT / "data" / "templates" / "projects_template.xlsx"
 

@@ -6,4 +6,4 @@ docs/
 old/
 tests/
 public/data/*
-*.xlsx
+**/*.xlsx
