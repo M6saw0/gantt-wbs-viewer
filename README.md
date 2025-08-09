@@ -1,5 +1,7 @@
 # WBS + ガントチャート ビューア
 
+![thumbnail](./img/thumbnail.png)
+
 Excelファイルからプロジェクトデータを読み込み、WBS（Work Breakdown Structure）とガントチャートを表示するWebアプリケーションです。
 
 ## 主な機能
