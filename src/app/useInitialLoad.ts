@@ -70,10 +70,14 @@ export function useInitialLoad() {
       // Select project
       let selectedProjectId = forceProjectId;
       
-      // If no project is forced and no saved selection, use first project
+      // If no project is forced, use the current selection from settings
       if (!selectedProjectId) {
-        if (settings.selectedProjectId && projects.find(p => p.projectId === settings.selectedProjectId)) {
-          selectedProjectId = settings.selectedProjectId;
+        // Get the latest settings state
+        const currentSettings = useSettingsStore.getState().settings;
+        
+        if (currentSettings.selectedProjectId && projects.find(p => p.projectId === currentSettings.selectedProjectId)) {
+          // Use the currently selected project
+          selectedProjectId = currentSettings.selectedProjectId;
         } else {
           // Use the first project in sheet order
           selectedProjectId = projects[0].projectId;
@@ -144,6 +148,9 @@ export function useInitialLoad() {
           type: 'success',
           message: `プロジェクト「${selectedProjectId}」を読み込みました`
         });
+        
+        // Ensure the UI reflects the correct project
+        console.log('Loaded project:', selectedProjectId);
       } catch (error) {
         showToast({
           type: 'error',
@@ -164,7 +171,7 @@ export function useInitialLoad() {
     } finally {
       setLoading(false);
     }
-  }, [config, settings.zoom]);
+  }, [config]);
   
   // Initial load
   useEffect(() => {
@@ -175,19 +182,20 @@ export function useInitialLoad() {
   useEffect(() => {
     const cpmResult = useDataStore.getState().cpmResult;
     const graph = useDataStore.getState().graph;
+    const currentSettings = useSettingsStore.getState().settings;
     
     if (cpmResult && graph) {
       const displayData = deriveDisplayData(
         cpmResult.tasks,
         graph.edges,
-        settings.zoom,
+        currentSettings.zoom,
         1200,
         config?.rangeBeforeDays || 7,
         config?.rangeAfterDays || 45
       );
       setDisplayData(displayData);
     }
-  }, [settings.zoom]);
+  }, [settings.zoom, config]);
   
   return { reload: loadData };
 }
