@@ -1,0 +1,11 @@
+{
+  "excelPath": "data/project.xlsx",
+  "holidaySheetNames": ["祝日", "Holidays"],
+  "ui": {
+    "defaultZoom": "day",
+    "showHolidays": true,
+    "showCriticalPath": true
+  },
+  "rangeBeforeDays": 7,
+  "rangeAfterDays": 45
+}

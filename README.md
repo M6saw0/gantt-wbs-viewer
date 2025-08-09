@@ -1,67 +1,149 @@
-## 20250809_ganttchart
+# WBS + ガントチャート ビューア
 
-WBSとガントチャートをExcelから生成して表示するアプリのリポジトリです。
+Excelファイルからプロジェクトデータを読み込み、WBS（Work Breakdown Structure）とガントチャートを表示するWebアプリケーションです。
 
-### 構成
-- `data/`: 入力用Excelやテンプレート配置先
-  - `templates/`: テンプレート素材
-    - `csv/`: CSV（`project_A.csv`, `project_B.csv`, `holidays_template.csv`）
-- `docs/`: 仕様や手順ドキュメント
-  - `architecture.md`: アプリのアーキテクチャ概要
-  - `excel_workbook_setup.md`: Excelブック作成仕様（列定義・表示形式）
-- `scripts/`: ユーティリティスクリプト
-  - `.venv/`: 仮想環境（任意）
-  - `generate_excel_template.py`: CSVからExcelテンプレートを生成
-  - `requirements.txt`: 依存パッケージ
+## 主な機能
 
----
+### 📊 データ管理
+- **Excel読み込み**: `.xlsx`形式のファイルから複数プロジェクトを読み込み
+- **プロジェクト切り替え**: シートごとに管理された複数プロジェクトの切り替え
+- **祝日対応**: 祝日シートから祝日データを読み込み、カレンダー表示に反映(事前に登録する必要があります。)
 
-### 事前準備（テンプレート生成に必要なもの）
-- Python 3.10+
-- 依存インストール
-  - 仮想環境（任意）を使う場合（Linux/macOS）:
-    ```
-    cd scripts
-    python3 -m venv .venv
-    .venv/bin/pip install -r requirements.txt
-    ```
-  - Windows (PowerShell):
-    ```
-    cd scripts
-    py -3 -m venv .venv
-    .venv\Scripts\pip install -r requirements.txt
-    ```
+### 📈 スケジューリング
+- **CPM（Critical Path Method）**: 自動的にクリティカルパスを計算
+- **依存関係管理**: タスク間の前後関係を矢印で可視化
+- **進捗管理**: 各タスクの進捗率を視覚的に表示
 
----
+### 🎨 表示機能
+- **WBSツリー**: タスク一覧を階層的に表示（ID、分類、タスク名、担当、進捗）
+- **ガントチャート**: タスクの期間をバーで表示、依存関係を矢印で接続
+- **ズーム機能**: 日/週/月の3段階でズーム可能
+- **スクロール同期**: WBSとガントチャートの縦スクロールを同期
+- **ハイライト機能**: 
+  - クリティカルパスをオレンジ色で強調表示
+  - ホバー時に関連タスクと前工程を青色で強調
+- **カレンダー表示**: 週末と祝日を背景色で区別
+- **今日ライン**: 現在日を赤い破線で表示
 
-### Excelテンプレートの作成手順
-- 既存のCSVから、プロジェクトA/Bおよび祝日シートを含むExcelテンプレートを生成します。
-- 生成後、`data/` 直下にコピーしてアプリの入力として利用してください。
+## セットアップ
 
-手順（Linux/macOS）
-```
-# 生成
-.venv/bin/python generate_excel_template.py
+### 必要環境
+- Node.js 18以上
+- npm または yarn
 
-# 出力場所（テンプレート）
-# data/templates/projects_template.xlsx
-
-# アプリ入力として利用するために data/ にコピー
-cp data/templates/projects_template.xlsx data/projects.xlsx
+### インストール
+```bash
+npm install
 ```
 
-手順（Windows PowerShell）
+### 開発サーバーの起動
+```bash
+npm run dev
 ```
-# 生成
-.venv\Scripts\python generate_excel_template.py
+ブラウザで http://localhost:5173 を開く
 
-# 出力場所（テンプレート）
-# data\templates\projects_template.xlsx
+### ビルド
+```bash
+npm run build
+```
+成果物は `dist/` ディレクトリに出力されます
 
-# アプリ入力として利用するために data\ にコピー
-Copy-Item data\templates\projects_template.xlsx data\projects.xlsx
+## Excelファイルの準備
+
+### ファイル配置
+`public/data/project.xlsx` にExcelファイルを配置してください。
+
+### シート構成
+- **プロジェクトシート**: 各シートが1つのプロジェクトを表します
+- **祝日シート**: シート名を「祝日」または「Holidays」にしてください
+
+### プロジェクトシートの列定義
+
+| 列名 | 必須 | 形式 | 説明 | 例 |
+|---|---|---|---|---|
+| ID | ✓ | 整数 | タスクID（シート内で一意） | 1 |
+| タスク名 | ✓ | 文字列 | タスクの名称 | 設計レビュー |
+| 分類1 | - | 文字列 | 大分類 | 設計 |
+| 分類2 | - | 文字列 | 中分類 | UI |
+| 分類3 | - | 文字列 | 小分類 | 画面A |
+| 開始日 | - | 日付 | YYYY/M/D形式 | 2025/8/1 |
+| 終了日 | - | 日付 | YYYY/M/D形式 | 2025/8/5 |
+| 工数（人日） | - | 数値 | 作業日数 | 3 |
+| 前工程 | - | 文字列 | 依存するタスクID（カンマ区切り） | 10,12 |
+| 担当 | - | 文字列 | 担当者名 | 田中 |
+| 進捗（%） | - | 数値 | 0-100の進捗率 | 50 |
+| 詳細 | - | 文字列 | タスクの詳細説明 | 要件確認と資料精査 |
+| 備考 | - | 文字列 | 補足情報 | 外部調整あり |
+
+### 祝日シートの列定義
+
+| 列名 | 必須 | 形式 | 説明 | 例 |
+|---|---|---|---|---|
+| 日付 | ✓ | 日付 | YYYY/M/D形式 | 2025/1/1 |
+| 名称 | - | 文字列 | 祝日名 | 元日 |
+
+## 設定ファイル
+
+`public/config/app.config.json` で初期設定を変更できます：
+
+```json
+{
+  "excelPath": "data/project.xlsx",
+  "holidaySheetNames": ["祝日", "Holidays"],
+  "ui": {
+    "defaultZoom": "day",
+    "showHolidays": true,
+    "showCriticalPath": true
+  },
+  "rangeBeforeDays": 7,
+  "rangeAfterDays": 45
+}
 ```
 
-- 列仕様や表示形式の詳細は `docs/excel_workbook_setup.md` を参照してください。
-- 祝日は同一ブック内の `祝日` シートで管理します（互換で `Holidays` も認識）。
+## 使い方
 
+1. **プロジェクト選択**: ツールバーのドロップダウンからプロジェクトを選択
+2. **ズーム調整**: 日/週/月ボタンで時間軸の表示範囲を調整
+3. **表示設定**: 
+   - 祝日: 週末と祝日の背景表示ON/OFF
+   - クリティカルパス: クリティカルタスクの強調表示ON/OFF
+   - 今日: 今日ラインの表示ON/OFF
+4. **タスク詳細**: タスク行またはガントバーをクリックで詳細情報を表示
+5. **再読込**: Excelファイルを更新後、再読込ボタンで反映
+
+## 技術スタック
+
+- **フレームワーク**: React 18 + TypeScript
+- **ビルドツール**: Vite
+- **状態管理**: Zustand
+- **Excel処理**: SheetJS (xlsx)
+- **日付処理**: Day.js
+- **スタイリング**: CSS Modules
+
+## プロジェクト構成
+
+```
+src/
+├── app/              # メインアプリケーション
+├── components/       # UIコンポーネント
+│   ├── GanttChart/   # ガントチャート
+│   ├── WbsTree/      # WBSツリー
+│   ├── Toolbar/      # ツールバー
+│   ├── TaskCard/     # タスク詳細カード
+│   └── Toast/        # 通知
+├── features/         # ビジネスロジック
+│   ├── projects/     # プロジェクト管理
+│   ├── tasks/        # タスク処理
+│   └── schedule/     # スケジュール計算
+├── models/           # データモデル定義
+├── services/         # 外部サービス連携
+│   ├── config/       # 設定管理
+│   ├── excel/        # Excel読み込み
+│   └── storage/      # ローカルストレージ
+├── store/            # 状態管理
+└── utils/            # ユーティリティ関数
+```
+
+## ライセンス
+
+MIT
