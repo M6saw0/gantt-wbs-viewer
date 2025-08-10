@@ -38,7 +38,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       zoom: savedSettings.zoom || config.ui?.defaultZoom || 'day',
       showHolidays: savedSettings.showHolidays ?? config.ui?.showHolidays ?? true,
       showCriticalPath: savedSettings.showCriticalPath ?? config.ui?.showCriticalPath ?? true,
-      showTodayLine: savedSettings.showTodayLine ?? true,
+      showTodayLine: savedSettings.showTodayLine ?? config.ui?.showTodayLine ?? true,
       selectedProjectId: savedSettings.selectedProjectId,
       expandedGroups: savedSettings.expandedGroups || new Set<string>()
     };

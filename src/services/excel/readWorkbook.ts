@@ -39,6 +39,26 @@ export function getSheetNames(workbook: XLSX.WorkBook): string[] {
   return workbook.SheetNames;
 }
 
+export async function readWorkbookFromFile(file: File): Promise<XLSX.WorkBook> {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const data = new Uint8Array(arrayBuffer);
+    const workbook = XLSX.read(data, {
+      type: 'array',
+      cellDates: true,
+      dateNF: 'yyyy/m/d'
+    });
+    return workbook;
+  } catch (error) {
+    console.error('Failed to read workbook from file:', error);
+    throw new Error(
+      `ローカルファイルからのExcel読み込みに失敗しました: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
+  }
+}
+
 export function getSheet(workbook: XLSX.WorkBook, sheetName: string): XLSX.WorkSheet | undefined {
   return workbook.Sheets[sheetName];
 }

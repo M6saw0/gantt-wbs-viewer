@@ -1,12 +1,12 @@
 import { AppConfig } from '../../models/types';
 
 const DEFAULT_CONFIG: AppConfig = {
-  excelPath: 'data/project.xlsx',
   holidaySheetNames: ['祝日', 'Holidays'],
   ui: {
     defaultZoom: 'week',
     showHolidays: true,
-    showCriticalPath: true
+    showCriticalPath: true,
+    showTodayLine: true
   },
   rangeBeforeDays: 7,
   rangeAfterDays: 45
