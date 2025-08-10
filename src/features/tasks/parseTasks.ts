@@ -33,6 +33,10 @@ export function parseTasks(
   
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
+    if (!row) {
+      console.warn(`Row ${i + 2}: empty row`);
+      continue;
+    }
     
     // Parse ID (required)
     const taskId = parseTaskId(row['ID']);

@@ -43,12 +43,13 @@ export interface Calendar {
 }
 
 export interface AppConfig {
-  excelPath: string;
+  excelPath?: string;
   holidaySheetNames: string[];
   ui?: {
     defaultZoom?: 'day' | 'week' | 'month';
     showHolidays?: boolean;
     showCriticalPath?: boolean;
+    showTodayLine?: boolean;
   };
   rangeBeforeDays?: number;
   rangeAfterDays?: number;

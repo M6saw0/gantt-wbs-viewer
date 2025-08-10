@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useDataStore } from '../../store/dataStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import './Toolbar.css';
 
 interface ToolbarProps {
-  onReload: () => void;
+  onOpenFile: (file: File) => void;
+  onSelectProject: (projectId: string) => void;
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({ onReload }) => {
+export const Toolbar: React.FC<ToolbarProps> = ({ onOpenFile, onSelectProject }) => {
   const projects = useDataStore(state => state.projects);
   const isLoading = useDataStore(state => state.isLoading);
   const { settings, setSelectedProject, setZoom, toggleHolidays, toggleCriticalPath, toggleTodayLine } = useSettingsStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const projectId = e.target.value;
     if (projectId) {
       setSelectedProject(projectId);
-      // Force reload with the new project
-      (onReload as any)(projectId);
+      // Force reload with the new project using current workbook
+      onSelectProject(projectId);
     }
   };
   
@@ -25,14 +27,45 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onReload }) => {
     setZoom(zoom);
   };
   
+  const handleOpenFileClick = () => {
+    fileInputRef.current?.click();
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onOpenFile(file);
+      // Allow selecting the same file again later
+      e.currentTarget.value = '';
+    }
+  };
+  
   return (
     <div className="toolbar">
       <div className="toolbar-section">
         <div className="toolbar-item">
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            onChange={handleFileChange}
+            disabled={isLoading}
+          />
+          <button
+            onClick={handleOpenFileClick}
+            disabled={isLoading}
+            className="toolbar-button toolbar-button-primary"
+          >
+            {isLoading ? '読込中...' : 'ファイルを開く'}
+          </button>
+        </div>
+        
+        <div className="toolbar-item">
           <label htmlFor="project-select">プロジェクト:</label>
           <select
             id="project-select"
-            value={settings.selectedProjectId || (projects.length > 0 ? projects[0].projectId : '')}
+            value={settings.selectedProjectId || (projects.length > 0 && projects[0] ? projects[0].projectId : '')}
             onChange={handleProjectChange}
             disabled={isLoading}
             className="toolbar-select"
@@ -44,14 +77,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onReload }) => {
             ))}
           </select>
         </div>
-        
-        <button
-          onClick={() => onReload()}
-          disabled={isLoading}
-          className="toolbar-button toolbar-button-primary"
-        >
-          {isLoading ? '読込中...' : '再読込'}
-        </button>
       </div>
       
       <div className="toolbar-section">
